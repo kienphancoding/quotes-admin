@@ -1,0 +1,33 @@
+.wrapper{
+  position: fixed;
+  background-color: var(--color-white);
+  height: calc(100vh - var(--height-header));
+  width: var(--width-sidebar);
+  top: var(--height-header);
+  border-right: 2px solid var(--color-black);
+}
+
+.item{
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  padding: 10px var(--padding-header);
+  .icon{
+    font-size: 23px;
+    width: 23px;
+    height: 23px;
+  }
+  .text{
+    font-size: 20px;
+    padding-left: 10px;
+  }
+  &:hover{
+    background-color: var(--color-gray);
+    color: var(--color-white);
+  }
+}
+
+.active{
+  background-color: var(--color-black);
+  color: white;
+}

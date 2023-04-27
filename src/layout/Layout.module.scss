@@ -1,0 +1,6 @@
+.content {
+  width: calc(100vw - var(--width-sidebar));
+  height: calc(100vh - var(--height-header));
+  margin-top: var(--height-header);
+  margin-left: var(--width-sidebar);
+}

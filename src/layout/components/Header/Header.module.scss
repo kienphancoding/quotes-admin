@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px var(--padding-header);
+  height: var(--height-header);
+  background-color: var(--color-white);
+  position: fixed;
+  width: 100vw;
+  border-bottom: 2px solid var(--color-black);
+  z-index: 1000;
+}
