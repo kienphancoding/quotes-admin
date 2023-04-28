@@ -12,6 +12,7 @@ const Profession = () => {
   const [nameUpdate, setNameUpdate] = useState("");
   const [pathUpdate, setPathUpdate] = useState("");
 
+  const [idUpdate, setIdUpdate] = useState(0);
   const [isShow, setIsShow] = useState(false);
 
   const urlApi = useContext(ApiUrlContext);
@@ -25,7 +26,7 @@ const Profession = () => {
   const handleCreate = () => {
     let dataCreate = {
       name: name,
-      path: path
+      path: path,
     };
 
     fetch(urlApi + "profession", {
@@ -34,20 +35,46 @@ const Profession = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(dataCreate),
-    })
-    // then(res=>res.json());
+    });
 
     setName("");
     setPath("");
   };
 
+  const handleShowFormUpdate = (id) => {
+    setIsShow(true);
+    setIdUpdate(id);
+    fetch(urlApi + "profession/" + id)
+      .then((x) => x.json())
+      .then((x) => {
+        setNameUpdate(x.name);
+        setPathUpdate(x.path);
+      });
+  };
+
+  const handleUpdate = () => {
+    const dataUpdate = {
+      name: nameUpdate,
+      path: pathUpdate,
+    };
+
+    fetch(urlApi + "profession/" + idUpdate, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataUpdate),
+    });
+
+    setNameUpdate("");
+    setPathUpdate("");
+    setIsShow(false);
+  };
+
   return (
     <div className={clsx(style.wrapper)}>
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <div
-          className="mb-4"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
+        <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Name
           </label>
@@ -72,6 +99,7 @@ const Profession = () => {
           </button>
         </div>
       </div>
+      
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase dark:text-gray-400">
@@ -107,7 +135,7 @@ const Profession = () => {
                   <td className="px-6 py-4">
                     <button
                       className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                      // onClick={() => handleShowFormUpdate(item.id)}
+                      onClick={() => handleShowFormUpdate(item.id)}
                     >
                       Update
                     </button>
@@ -117,6 +145,36 @@ const Profession = () => {
             );
           })}
         </table>
+
+        {isShow && (
+          <>
+            <h1>Update form , ID : {idUpdate}</h1>
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Name
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={nameUpdate}
+                onChange={(e) => setNameUpdate(e.target.value)}
+              />
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Path
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={pathUpdate}
+                onChange={(e) => setPathUpdate(e.target.value)}
+              />
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleUpdate}
+              >
+                Updated
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import style from "./Author.module.scss";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ApiUrlContext } from "../../layout/Layout";
 
 const Author = () => {
   const [data, setData] = useState([]);
@@ -10,21 +11,39 @@ const Author = () => {
   const [path, setPath] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
+  const [professionId, setProfessionId] = useState(0);
 
   //Value updated
   const [nameUpdate, setNameUpdate] = useState("");
   const [pathUpdate, setPathUpdate] = useState("");
   const [descriptionUpdate, setDesriptionUpdate] = useState("");
   const [imageUpdate, setImageUpdate] = useState("");
+  const [professionIdUpdate, setProfessionIdUpdate] = useState(0);
 
   const [isShowForm, setIsShowForm] = useState(false);
   const [idUpdated, setIdUpdated] = useState(0);
 
+  const [profession, setProfession] = useState([]);
+
+  const urlApi = useContext(ApiUrlContext);
+
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/author")
+    fetch(urlApi + "author")
       .then((x) => x.json())
       .then((x) => setData(x));
+
+    fetch(urlApi + "profession")
+      .then((x) => x.json())
+      .then((x) => setProfession(x));
   }, []);
+
+  const handleCheck = (id) => {
+    setProfessionId(id);
+  };
+
+  const handleCheckUpdate = (id) => {
+    setProfessionIdUpdate(id);
+  };
 
   const handleCreate = () => {
     const dataCreate = {
@@ -32,11 +51,10 @@ const Author = () => {
       path: path,
       description: description,
       image_link: image,
+      profession_id: professionId,
     };
 
-    console.log(dataCreate);
-    
-    fetch("http://127.0.0.1:8000/api/author", {
+    fetch(urlApi + "author", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +71,7 @@ const Author = () => {
   const handleShowFormUpdate = (id) => {
     setIsShowForm(true);
     setIdUpdated(id);
-    fetch("http://127.0.0.1:8000/api/author/" + id)
+    fetch(urlApi+"author/" + id)
       .then((x) => x.json())
       .then((x) => {
         setNameUpdate(x.name);
@@ -69,9 +87,16 @@ const Author = () => {
       path: pathUpdate,
       description: descriptionUpdate,
       image_link: imageUpdate,
+      profession_id: professionIdUpdate,
     };
 
-    console.log(JSON.stringify(dataUpdate));
+    fetch(urlApi + "author/" + idUpdated, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataUpdate),
+    });
 
     setNameUpdate("");
     setPathUpdate("");
@@ -83,17 +108,31 @@ const Author = () => {
   return (
     <div className={clsx(style.wrapper)}>
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <div
-          className="mb-4"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
-          <label className="block text-gray-700 text-sm font-bold mb-2">Name</label>
+        <div className="mb-4">
+          {profession.map((item, index) => {
+            return (
+              <div key={index}>
+                <input
+                  type="checkbox"
+                  onClick={() => handleCheck(item.id)}
+                  checked={item.id === professionId}
+                />
+                <label for="vehicle3">{item.name}</label>
+              </div>
+            );
+          })}
+
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Name
+          </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <label className="block text-gray-700 text-sm font-bold mb-2">Path</label>
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Path
+          </label>
           <input
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             value={path}
@@ -188,28 +227,61 @@ const Author = () => {
       </div>
 
       {isShowForm && (
-        <>
+        <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <h1>Update form , ID : {idUpdated}</h1>
           <div>
+            {profession.map((item, index) => {
+              return (
+                <div key={index}>
+                  <input
+                    type="checkbox"
+                    onClick={() => handleCheckUpdate(item.id)}
+                    checked={item.id === professionId}
+                  />
+                  <label>{item.name}</label>
+                </div>
+              );
+            })}
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Name
+            </label>
             <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={nameUpdate}
               onChange={(e) => setNameUpdate(e.target.value)}
             />
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Path
+            </label>
             <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={pathUpdate}
               onChange={(e) => setPathUpdate(e.target.value)}
             />
-            <input
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Description
+            </label>
+            <textarea
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={descriptionUpdate}
               onChange={(e) => setDesriptionUpdate(e.target.value)}
             />
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Image link
+            </label>
             <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={imageUpdate}
               onChange={(e) => setImageUpdate(e.target.value)}
             />
-            <button onClick={handleUpdate}>Updated</button>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleUpdate}
+            >
+              Updated
+            </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
